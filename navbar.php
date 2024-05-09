@@ -1,18 +1,27 @@
 <?php
 
 include("./config.php");
-     
-$sql = $mysqli->query("SELECT * FROM `enrollees` LIMIT 10");
-$students = $sql->fetch_all(MYSQLI_ASSOC);
 
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+   
+    $username = $_POST["username"];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
 
-if ($mysqli->query("SELECT COUNT(*) FROM `enrollees`")->fetch_row()[0] == 0) {
-    
-    $mysqli->query("TRUNCATE TABLE `enrollees`");
+   
+    $mysqli->query("INSERT INTO `enrollees` (`username`, `email`, `password`) VALUES ('$username', '$email', '$password')");
+
+  
+    $insertion_order = $mysqli->query("SELECT MAX(`student_id`) FROM `enrollees`")->fetch_row()[0] + 1;
+    $mysqli->query("UPDATE `enrollees` SET `insertion_order` = $insertion_order WHERE `username` = '$username'");
 }
 
-?>
 
+$sql = $mysqli->query("SELECT * FROM `enrollees` ORDER BY `student_id` LIMIT 10 ");
+$students = $sql->fetch_all(MYSQLI_ASSOC);
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
